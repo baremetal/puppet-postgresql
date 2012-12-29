@@ -1,0 +1,40 @@
+Exec { path => "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin" }
+
+
+class postgres {
+  $system_memory = 536870912
+
+  exec { "update_apt":
+    command => "apt-get update",
+    refreshonly => true,
+  }
+
+  exec { "apply_sysctl":
+    command => "sysctl -p /etc/sysctl.conf",
+    refreshonly => true,
+  }
+
+  exec { "add_pitti_ppa":
+    command => "apt-add-repository ppa:pitti/postgresql",
+    unless => "test -e /etc/apt/sources.list.d/pitti-postgresql-precise.list",
+    notify => Exec["update_apt"],
+  }
+
+  package { ["postgresql-client-9.2", "postgresql-9.2"]:
+    ensure => present,
+    require => Exec["add_pitti_ppa"],
+  }
+
+  file { "/etc/postgresql/9.2/main/postgresql.conf":
+    ensure => present,
+    content => template("/etc/puppet/modules/postgres/templates/etc/postgresql/9.2/main/postgresql.conf"),
+  }
+
+  file { "/etc/sysctl.d/30-postgresql-shm.conf":
+    ensure => present,
+    content => template("/etc/puppet/modules/postgres/templates/etc/sysctl.d/30-postgresql-shm.conf"),
+    notify => Exec["apply_sysctl"],
+  }
+}
+
+include postgres
