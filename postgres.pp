@@ -9,9 +9,10 @@ class postgres {
     refreshonly => true,
   }
 
-  exec { "apply_sysctl":
-    command => "sysctl -p /etc/sysctl.conf",
+  exec { "notify_reboot":
+    command => "echo '*** YOU NEED TO REBOOT IN ORDER TO APPLY SYSCTL CHANGES! ***'",
     refreshonly => true,
+    logoutput => true,
   }
 
   exec { "add_pitti_ppa":
@@ -33,7 +34,7 @@ class postgres {
   file { "/etc/sysctl.d/30-postgresql-shm.conf":
     ensure => present,
     content => template("/etc/puppet/modules/postgres/templates/etc/sysctl.d/30-postgresql-shm.conf"),
-    notify => Exec["apply_sysctl"],
+    notify => Exec["notify_reboot"],
   }
 }
 
