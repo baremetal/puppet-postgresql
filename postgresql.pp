@@ -41,6 +41,7 @@ class postgresql {
   file { "/etc/sysctl.d/30-postgresql-shm.conf":
     ensure => present,
     content => template("/etc/puppet/modules/postgresql/templates/etc/sysctl.d/30-postgresql-shm.conf"),
+    require => Package["postgresql-9.2"],
     notify => Exec["notify_reboot"],
   }
 }
