@@ -1,7 +1,7 @@
 Exec { path => "/bin:/sbin:/usr/bin:/usr/sbin:/usr/local/bin:/usr/local/sbin" }
 
 
-class postgres {
+class postgresql {
   $system_memory = 536870912
 
   service { "postgresql":
@@ -33,17 +33,17 @@ class postgres {
 
   file { "/etc/postgresql/9.2/main/postgresql.conf":
     ensure => present,
-    content => template("/etc/puppet/modules/postgres/templates/etc/postgresql/9.2/main/postgresql.conf"),
+    content => template("/etc/puppet/modules/postgresql/templates/etc/postgresql/9.2/main/postgresql.conf"),
     require => Package["postgresql-9.2"],
     notify => Service["postgresql"],
   }
 
   file { "/etc/sysctl.d/30-postgresql-shm.conf":
     ensure => present,
-    content => template("/etc/puppet/modules/postgres/templates/etc/sysctl.d/30-postgresql-shm.conf"),
+    content => template("/etc/puppet/modules/postgresql/templates/etc/sysctl.d/30-postgresql-shm.conf"),
     notify => Exec["notify_reboot"],
   }
 }
 
 
-include postgres
+include postgresql
